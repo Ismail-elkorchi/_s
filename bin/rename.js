@@ -24,41 +24,24 @@ const excludes = [
 ///joining path of directory 
 const directoryPath = path.join(__dirname, '../');
 //passsing directoryPath and callback function
-function readdircontent(directoryPath) {
-
-    if ( ! fs.lstatSync(directoryPath).isFile()) { 
-
-        fs.readdir(directoryPath, function (err, files) {
-            //handling error
-            if (err) {
-                return console.log('Unable to scan directory: ' + err);
-            } 
-            
-            //listing all files using forEach
-            files.forEach(function (file) {
-
-            // console.log( file);
-                
-                if (err) { throw err; }
-
-                if (! excludes.includes(file)){
-
-                    if (fs.lstatSync(directoryPath + file).isDirectory()) { 
-                        console.log("//-------------------------- Sub Directory -----------------" + file);
-                        readdircontent(directoryPath + file+ '/');
-                    } else {
-                        DoReplacement(directoryPath + file);
-                    }
-                }
-            });
-        });
-    }
-}
+var traverseFileSystem = function (currentPath) {
+    var files = fs.readdirSync(currentPath);
+    for (var i in files) {
+       var currentFile = currentPath + '/' + files[i];
+       var stats = fs.statSync(currentFile);
+       if (stats.isFile() && ! excludes.includes(files[i]) ) {
+        doReplacement(currentFile);
+       }
+      else if (stats.isDirectory() && ! excludes.includes(files[i]) ) {
+             traverseFileSystem(currentFile);
+           }
+     }
+   };
 
 
-function DoReplacement(file) {
+function doReplacement(file) {
     // Do whatever you want to do with the file
-    console.log(directoryPath + file); 
+    console.log(file); 
     fs.readFile(file, 'utf8', function (err,data) {
         if (err) {
             return console.log(err);
@@ -76,4 +59,4 @@ function DoReplacement(file) {
     });
 }
 
-readdircontent(directoryPath);
+traverseFileSystem('.');
