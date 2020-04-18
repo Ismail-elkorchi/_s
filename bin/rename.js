@@ -46,11 +46,12 @@ function doReplacement(file) {
         if (err) {
             return console.log(err);
         }
-        var result = data.replace(/'_s'/g, 'text-domain');
-        result = result.replace(/_s_/g, 'funcntion_name_');
-        result = result.replace(/Text Domain: _s/g, 'Text Domain: text-domain');
-        result = result.replace(/_s/g, 'Dock_block');
-        result = result.replace(/_s-/g, 'prefix-handler');
+
+        var result = data.replace(/@package _s/g, '@package ' + 'my awesome package'.replace(/ /g, '_' ));
+        result = result.replace(/_s-/g, 'prefix-handler'); // Script/style handles.
+        result = result.replace(/'_s'/g, "'text-domain");  // Textdomains.
+        result = result.replace(/_s_/g, 'function_name_'); // Function names.
+        result = result.replace(/\b_s\b/g, 'Dock_block');
         result = result.replace(/_S_/g, 'CONST');
         
         fs.writeFile(file, result, 'utf8', function (err) {
